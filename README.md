@@ -19,3 +19,10 @@ This Project BackEnd Deploy Vercel And FrontEnd Deploy Netlify.
 
 
 ---Feature Add---
+1.User Tar Profile Dekhte Parbe.
+
+2.User Tar Password Change Korte Parbe.
+
+3.Ekta Admin Deshboard Thakbe, User Chaile Post Add, Edit, Delete Korte Parble, User Desable And Enable Korte Parbe.
+
+4.Baki Feature Pore Jananu Hobe..........
