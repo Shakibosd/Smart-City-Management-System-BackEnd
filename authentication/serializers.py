@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import CustomUser
+from .models import Profile
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,9 +17,12 @@ class UserListSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only = True)
 
+    profile_img = serializers.ImageField(write_only=True)
+
+
     class Meta:
-        model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password', 'profile_image']
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password', 'profile_img']
         extra_kwargs = {
             'password' : {'write_only' : True} 
         }
@@ -31,16 +34,17 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        user = CustomUser.objects.create_user(
+        profile_img = validated_data.pop('profile_img', None)
+        user = User.objects.create_user(
             username = validated_data['username'],
             first_name = validated_data['first_name'],
             last_name = validated_data['last_name'],
             email = validated_data['email'],
             password = validated_data['password'],
-            profile_image = validated_data.get('profile_image', None)
         )
         user.is_active = False
         user.save()
+        Profile.objects.create(user=user, profile_img=profile_img)
         return user
     
 

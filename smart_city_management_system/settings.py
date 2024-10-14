@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import os
 from pathlib import Path
 import environ
 env = environ.Env()
@@ -29,14 +28,14 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = []
 # CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000','https://*.127.0.0.1']
 
-LOGIN_URL = "http://127.0.0.1:5500/login.html"
+# LOGIN_URL = "http://127.0.0.1:5500/login.html"
 
 CROS_ALLOW_ALL_ORIGINS = True
 
-AUTH_USER_MODEL = 'authentication.CustomUser'
+# AUTH_USER_MODEL = 'authentication.CustomUser'
 
 # Application definition
 
@@ -88,7 +87,6 @@ REST_FRAMEWORK = {
 # ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    # "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -193,7 +191,7 @@ EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 SITE_ID=1
 
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env("EMAIL")
 EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")

@@ -2,8 +2,7 @@ from rest_framework.views import APIView
 from .serializers import RegisterSerializer,LoginSerializer,UserListSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes
-from django.contrib.auth.models import User
+from django.utils.encoding import force_bytes, force_str
 from django.shortcuts import redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
@@ -11,6 +10,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
+# from .models import CustomUser
+from django.contrib.auth.models import User
 
 #user list dekhar jonno
 class UserListAPIView(APIView):
@@ -55,8 +56,11 @@ class RegisterAPIView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            print(user)
             token = default_token_generator.make_token(user)
+            print(token)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
+            print(uid)
             confirm_link = f'http://127.0.0.1:8000/authentication/active/{uid}/{token}/'
             email_subject = 'Confirm Your Email'
             email_body = render_to_string('confirm_email.html', {'confirm_link' : confirm_link})
@@ -67,10 +71,11 @@ class RegisterAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #user activat hobe link diye
-def user_activate(uid64, token):
+def user_activate(request, uid64, token):
     try:
         uid = urlsafe_base64_decode(uid64).decode()
         user = User._default_manager.get(pk=uid)
+        print(request)
 
     except (User.DoesNotExist):
         user = None
@@ -96,9 +101,10 @@ class LoginAPIView(APIView):
 
             if user:
                 token, _ = Token.objects.get_or_create(user=user)
+                print(_)
                 login(request, user)
                 return Response({'token' : token.key, 'user_id' : user.id}, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
         
 #user website theke bahir hobe        
 class LogoutAPIView(APIView):
@@ -109,3 +115,51 @@ class LogoutAPIView(APIView):
 
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+#user tar password ta jeno reset dite pare
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+
+        except User.DoesNotExist:
+            return Response({"error": "No User With This Email"}, status=status.HTTP_400_BAD_REQUEST)
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))   
+        reset_link = f'http://127.0.0.1:8000/password_reset/{uid}/{token}/'
+        email_subject = 'Password Reset Request'
+        email_body = render_to_string('reset_password_email.html', {'reset_link': reset_link})
+        email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+        email.attach_alternative(email_body, 'text/html')
+        email.send()
+
+        return Response({"detail": "Password Reset Email Sent"}, status=status.HTTP_200_OK)
+
+    
+#user tar password ta jeno reset er jonno confirm korte parbe
+class PasswordResetConfirmView(APIView):
+    def post(self, request, token, uidb64):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            password = request.data.get('password')
+            confirm_password = request.data.get('confirm_password')
+
+            if password != confirm_password:
+                return Response({"error": "Passwords Do Not Match"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if len(password) < 8:
+                return Response({"error": "Password must be at least 8 characters long"}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.set_password(password)
+            user.save()
+            return Response({"detail": "Password Has Been Reset Successfully"}, status=status.HTTP_200_OK)
+
+        else:
+            return Response({"error": "Invalid Token Or User"}, status=status.HTTP_400_BAD_REQUEST)
