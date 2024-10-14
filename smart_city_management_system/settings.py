@@ -29,13 +29,14 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+# CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000','https://*.127.0.0.1']
 
 LOGIN_URL = "http://127.0.0.1:5500/login.html"
 
 CROS_ALLOW_ALL_ORIGINS = True
 
-# AUTH_USER_MODEL = "admins.CustomUser"
+AUTH_USER_MODEL = 'authentication.CustomUser'
 
 # Application definition
 
