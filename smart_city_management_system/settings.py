@@ -65,6 +65,8 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
+    "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
+    
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
@@ -163,6 +165,8 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
+
+TIME_ZONE = 'Asia/Dhaka'
 
 USE_TZ = True
 

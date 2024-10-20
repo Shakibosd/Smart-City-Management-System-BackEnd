@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import MobileAppFeature
 
-# Register your models here.
+class MobileAppFeatureAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'description', 'version', 'release_date']
+
+admin.site.register(MobileAppFeature, MobileAppFeatureAdmin)

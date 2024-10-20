@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
-# from .models import CustomUser
 from django.contrib.auth.models import User
 
 #user list dekhar jonno
