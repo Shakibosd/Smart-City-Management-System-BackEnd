@@ -62,7 +62,10 @@ INSTALLED_APPS = [
     'public_transport',
     'reporting_system',
     'traffic_management',
+    'reviews',
+    'channels',
 ]
+
 
 REST_FRAMEWORK = {
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
@@ -75,6 +78,21 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
+}
+
+ASGI_APPLICATION = 'your_project_name.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
+# SSLCommerz configuration
+SSL_COMMERZ = {
+    'store_id': 'your_store_id',
+    'store_password': 'your_store_password',
+    'sandbox': True  # Make it False for production
 }
 
 
